@@ -174,6 +174,22 @@ const linksByCell = {
 const escapeHtml = text => text.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 function linkedHtml(cell, text){let html=escapeHtml(text);for(const [label,url] of (linksByCell[cell]||[])){const safe=escapeHtml(label);html=html.replace(safe,`<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${safe}</a>`)}return html}
 
-const rowsEl=document.getElementById("guidelineRows"),searchInput=document.getElementById("searchInput"),linksOnly=document.getElementById("linksOnly"),resultCount=document.getElementById("resultCount"),emptyState=document.getElementById("emptyState");let activeStage="all";
+const rowsEl=document.getElementById("guidelineRows"),searchInput=document.getElementById("searchInput"),linksOnly=document.getElementById("linksOnly"),resultCount=document.getElementById("resultCount"),emptyState=document.getElementById("emptyState");
+const stateKey="engineering-guidelines-view";
+let savedState={};
+try{savedState=JSON.parse(localStorage.getItem(stateKey)||"{}")}catch(_error){savedState={}}
+let activeStage=["all","before","during","after"].includes(savedState.stage)?savedState.stage:"all";
+searchInput.value=savedState.search||"";
+linksOnly.checked=Boolean(savedState.linksOnly);
+function saveState(){savedState={stage:activeStage,search:searchInput.value,linksOnly:linksOnly.checked,scrollY:window.scrollY};localStorage.setItem(stateKey,JSON.stringify(savedState))}
+function syncStageButtons(){document.querySelectorAll(".stage-tabs button").forEach(button=>button.classList.toggle("active",button.dataset.stage===activeStage))}
 function render(){const q=searchInput.value.trim().toLowerCase();let visible=0;rowsEl.innerHTML="";rows.forEach((row,index)=>{const sheetRow=index+2;const cells=[{key:`B${sheetRow}`,stage:"before",text:row[1]},{key:`C${sheetRow}`,stage:"during",text:row[2]},{key:`D${sheetRow}`,stage:"after",text:row[3]}];const filtered=cells.map(c=>{const stageOk=activeStage==="all"||activeStage===c.stage;const queryOk=!q||c.text.toLowerCase().includes(q);const linkOk=!linksOnly.checked||(linksByCell[c.key]||[]).length>0;return{...c,show:stageOk&&queryOk&&linkOk}});if(!filtered.some(c=>c.show))return;visible++;const article=document.createElement("article");article.className="guideline-row";article.innerHTML=`<div class="step-cell">${escapeHtml(row[0])}</div>`+filtered.map(c=>`<div class="content-cell ${c.show?"":"stage-hidden"}" data-stage="${c.stage}">${linkedHtml(c.key,c.text)}</div>`).join("");rowsEl.appendChild(article)});resultCount.textContent=`顯示 ${visible} 筆`;emptyState.hidden=visible!==0}
-searchInput.addEventListener("input",render);linksOnly.addEventListener("change",render);document.querySelectorAll(".stage-tabs button").forEach(button=>button.addEventListener("click",()=>{document.querySelectorAll(".stage-tabs button").forEach(b=>b.classList.remove("active"));button.classList.add("active");activeStage=button.dataset.stage;render()}));render();
+searchInput.addEventListener("input",()=>{render();saveState()});
+linksOnly.addEventListener("change",()=>{render();saveState()});
+document.querySelectorAll(".stage-tabs button").forEach(button=>button.addEventListener("click",()=>{activeStage=button.dataset.stage;syncStageButtons();render();saveState()}));
+document.addEventListener("click",event=>{if(event.target.closest("a"))saveState()});
+window.addEventListener("pagehide",saveState);
+window.addEventListener("pageshow",()=>{syncStageButtons();render();const y=Number(savedState.scrollY)||0;requestAnimationFrame(()=>window.scrollTo(0,y))});
+syncStageButtons();
+render();
+requestAnimationFrame(()=>window.scrollTo(0,Number(savedState.scrollY)||0));

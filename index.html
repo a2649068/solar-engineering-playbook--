@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="工務處案場施工前、施工中與施工後工作準則及參考表單">
+  <title>工務處工作準則</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">工</span><div><p class="eyebrow">ENGINEERING OPERATIONS</p><h1>工務處工作準則</h1></div></div>
+    <a class="source-link" href="https://docs.google.com/spreadsheets/d/1gBMufgeZN5NfxECtjKewOIs8gn62aR02M7CRxchHTWQ/edit" target="_blank" rel="noopener noreferrer">開啟原始試算表 ↗</a>
+  </header>
+  <main>
+    <section class="intro"><div><p class="kicker">專案執行指引</p><h2>從施工準備到完工交付，<br>每一步都有明確依據。</h2></div><p class="intro-copy">依照最新版 Google 試算表整理。藍色文字可直接開啟 BPM、WEBISO、Google Drive 或政府網站參考資料。</p></section>
+    <section class="controls" aria-label="內容篩選">
+      <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="搜尋工作內容、表單編號或關鍵字…" autocomplete="off"></label>
+      <label class="toggle"><input id="linksOnly" type="checkbox"><span>只顯示含連結項目</span></label>
+      <span id="resultCount" class="result-count"></span>
+    </section>
+    <nav class="stage-tabs" aria-label="施工階段"><button class="active" data-stage="all">全部</button><button data-stage="before">施工前</button><button data-stage="during">施工中</button><button data-stage="after">施工後</button></nav>
+    <section class="guideline-shell">
+      <div class="table-head"><div class="step-head">步驟</div><div class="stage-head before"><span>01</span>案場施工前</div><div class="stage-head during"><span>02</span>案場施工中</div><div class="stage-head after"><span>03</span>案場施工後</div></div>
+      <div id="guidelineRows" class="guideline-rows"></div>
+      <div id="emptyState" class="empty-state" hidden>找不到符合條件的工作項目。</div>
+    </section>
+  </main>
+  <footer><span>工務處工作準則</span><span>資料來源：最新版 Google 試算表</span></footer>
+  <script src="script.js"></script>
+</body>
+</html>
